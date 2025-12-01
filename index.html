@@ -44,10 +44,9 @@
 
       body {
         font-family: "Zen Maru Gothic", sans-serif;
-        background-color: var(--ckw-pink);
+        background-image: url(bg2.jpg);
+        background-size: cover;
         /* 粉嫩主色 */
-        background-image: radial-gradient(var(--ckw-shadow) 1px, transparent 0);
-        background-size: 20px 20px;
         min-height: 100vh;
         color: var(--ckw-dark);
         overflow-x: hidden;
@@ -60,7 +59,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
-        background: var(--ckw-pink);
+        background: #ffffff5e;
         /* 確保與背景色一致 */
         position: sticky;
         top: 0;
@@ -123,26 +122,25 @@
 
       /* === 核心：今日焦點卡片 (像甜點的圓角) === */
       .hero-card {
-        background: white;
+        background: rgba(255, 255, 255, 0.865);
         border-radius: 35px;
         /* 超大圓角 */
         padding: 40px 25px;
         text-align: center;
         box-shadow: 0 10px 20px var(--ckw-shadow);
-        border: 5px solid var(--ckw-yellow);
+        border: 5px solid rgb(0, 97, 0);
         /* 奶油邊框 */
         margin-bottom: 25px;
+        margin-top: 25px;
         position: relative;
-        transform: rotate(-1deg);
-        /* 有點手繪感 */
       }
 
       .hero-period {
         position: absolute;
         top: -25px;
         left: 50%;
-        transform: translateX(-50%) rotate(3deg);
-        background: var(--ckw-green);
+        transform: translateX(-50%); /* 修正旋轉效果，只保留置中 */
+        background: #ffbf00;
         color: var(--ckw-dark);
         padding: 8px 25px;
         border-radius: 25px;
@@ -200,23 +198,26 @@
         gap: 15px;
         margin-top: 30px;
         padding-top: 25px;
-        border-top: 2px dashed var(--ckw-pink);
+        border-top: 2px dashed rgb(56, 132, 35);
       }
 
       .advice-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        background: var(--ckw-blue);
+        background: #fff9c8;
         /* 柔和底色 */
         padding: 15px;
         border-radius: 25px;
         /* 圓潤貼紙 */
-        border: 2px dashed var(--ckw-dark);
+        border: 2px dashed rgb(56, 132, 35);
       }
 
+      /* 修正：為圖片設定寬高 */
       .advice-icon {
-        font-size: 2.5rem;
+        width: auto;
+        height: 100px;
+        object-fit: contain;
         margin-bottom: 5px;
       }
 
@@ -241,7 +242,6 @@
         display: inline-block;
         background: var(--ckw-yellow);
         border-radius: 15px;
-        transform: rotate(-1deg);
       }
 
       .scroll-container {
@@ -357,7 +357,7 @@
 
   <body>
     <div id="loading" class="loading-screen">
-      <div class="chii-wave">🥳</div>
+      <div class="chii-wave"><img src="cloth-normal.png" alt="" /></div>
       <p class="loading-text">吉伊卡娃正在觀測雲的流動...</p>
     </div>
 
@@ -387,14 +387,8 @@
     <script>
       // === 程式碼修改處 START ===
 
-      // ⚠️ 【重要】請將此變數替換為您 Zeabur 後端服務的根網址
-      // 例如: "https://your-service-name.zeabur.app"
-      // 確保結尾沒有斜線 (/)
-      const API_ROOT_URL = "https://cwa-backend-api.zeabur.app";
-      // 後端天氣路由的固定前綴
+      const API_ROOT_URL = "https://min-weather.zeabur.app";
       const API_WEATHER_PATH = "/api/weather";
-
-      // === 程式碼修改處 END ===
 
       // 台灣主要城市列表 (名稱須與 CWA API 接受的 locationName 一致)
       const CITIES = [
@@ -438,43 +432,50 @@
 
       function getWeatherIcon(weather) {
         if (!weather) return "✨";
-        if (weather.includes("晴") || weather.includes("多雲")) return "☀️";
-        if (weather.includes("陰") || weather.includes("多雲")) return "☁️";
+        if (weather.includes("晴") && !weather.includes("雲")) return "☀️";
+        if (weather.includes("多雲")) return "⛅";
+        if (weather.includes("陰")) return "☁️";
         if (weather.includes("雨")) return "🌧️";
         if (weather.includes("雷")) return "⛈️";
         if (weather.includes("寒")) return "🥶";
         return "😊";
       }
 
+      // 返回圖片的類別名稱（用於圖片路徑）
       function getAdvice(rainProb, maxTemp) {
         const r = parseInt(rainProb);
         const t = parseInt(maxTemp);
 
-        let rainIcon, rainText;
+        let rainClass, rainText;
         if (r > 60) {
-          rainIcon = "💧";
+          rainClass = "rain-heavy"; // 圖片檔名：rain-heavy.png
           rainText = "下雨了！記得撐傘";
         } else if (r > 30) {
-          rainIcon = "☔";
+          rainClass = "rain-light"; // 圖片檔名：rain-light.png
           rainText = "小雨機率，帶傘吧";
         } else {
-          rainIcon = "🥳";
+          rainClass = "rain-sunny"; // 圖片檔名：rain-sunny.png
           rainText = "今天是晴天！";
         }
 
-        let clothIcon, clothText;
+        let clothClass, clothText;
         if (t >= 28) {
-          clothIcon = "🥵";
+          clothClass = "cloth-hot"; // 圖片檔名：cloth-hot.png
           clothText = "好熱！穿短袖";
         } else if (t <= 20) {
-          clothIcon = "🥶";
+          clothClass = "cloth-cold"; // 圖片檔名：cloth-cold.png
           clothText = "冷！要穿外套喔";
         } else {
-          clothIcon = "👕";
+          clothClass = "cloth-normal"; // 圖片檔名：cloth-normal.png
           clothText = "剛剛好的天氣";
         }
 
-        return { rainIcon, rainText, clothIcon, clothText };
+        return {
+          rainIcon: rainClass,
+          rainText,
+          clothIcon: clothClass,
+          clothText,
+        };
       }
 
       function getTimePeriod(startTime) {
@@ -514,34 +515,38 @@
         );
 
         document.getElementById("heroCard").innerHTML = `
-                <div class="hero-card">
-                    <div class="hero-period">${period}的吉伊卡娃</div>
-                    <div class="hero-temp-container">
-                        <div class="hero-icon">${getWeatherIcon(
-          current.weather
-        )}</div>
-                        <div class="hero-temp">${avgTemp}°</div>
-                    </div>
-                    <div class="hero-desc">${current.weather}</div>
+          <div class="hero-card">
+              <div class="hero-period">${period}的吉伊卡娃</div>
+              <div class="hero-temp-container">
+                  <div class="hero-icon">${getWeatherIcon(
+                    current.weather
+                  )}</div>
+                  <div class="hero-temp">${avgTemp}°</div>
+              </div>
+              <div class="hero-desc">${current.weather}</div>
 
-                    <div class="advice-grid">
-                        <div class="advice-item">
-                            <div class="advice-icon">${advice.rainIcon}</div>
-                            <div class="advice-text">${advice.rainText}</div>
-                            <div style="font-size:0.8rem; color:#999; font-weight:normal;">💧 ${
-          current.rain
-        }</div>
-                        </div>
-                        <div class="advice-item">
-                            <div class="advice-icon">${advice.clothIcon}</div>
-                            <div class="advice-text">${advice.clothText}</div>
-                            <div style="font-size:0.8rem; color:#999; font-weight:normal;">高溫 ${
-          current.maxTemp
-        }</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+              <div class="advice-grid">
+                  <div class="advice-item">
+                      <img src="${advice.rainIcon}.png" alt="${
+          advice.rainText
+        }" class="advice-icon" />
+                      <div class="advice-text">${advice.rainText}</div>
+                      <div style="font-size:0.8rem; color:#999; font-weight:normal;">💧 ${
+                        current.rain
+                      }</div>
+                  </div>
+                  <div class="advice-item">
+                      <img src="${advice.clothIcon}.png" alt="${
+          advice.clothText
+        }" class="advice-icon" />
+                      <div class="advice-text">${advice.clothText}</div>
+                      <div style="font-size:0.8rem; color:#999; font-weight:normal;">高溫 ${
+                        current.maxTemp
+                      }</div>
+                  </div>
+              </div>
+          </div>
+        `;
 
         // 3. 渲染稍後預報
         const scrollContainer = document.getElementById("futureForecasts");
@@ -558,20 +563,18 @@
           }
 
           scrollContainer.innerHTML += `
-                    <div class="mini-card">
-                        <div class="mini-time">${p}</div>
-                        <div class="mini-icon">${getWeatherIcon(
-            f.weather
-          )}</div>
-                        <div class="mini-temp">${f.minTemp.replace(
-            "°C",
-            ""
-          )}° - ${f.maxTemp.replace("°C", "")}°</div>
-                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${
-            f.rain
-          }</div>
-                    </div>
-                `;
+            <div class="mini-card">
+                <div class="mini-time">${p}</div>
+                <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
+                <div class="mini-temp">${f.minTemp.replace(
+                  "°C",
+                  ""
+                )}° - ${f.maxTemp.replace("°C", "")}°</div>
+                <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${
+                  f.rain
+                }</div>
+            </div>
+          `;
         });
 
         // 4. 右上角顯示今日日期
@@ -591,7 +594,7 @@
         $loading.style.display = "flex";
         $mainContent.style.display = "none";
 
-        // ⚠️ 修正 URL 拼接：確保只有一個斜線在 API_ROOT_URL 和 API_WEATHER_PATH 之間
+        // 正確的 URL 拼接：根網址 + 路由前綴 + 城市名稱
         const requestUrl = `${API_ROOT_URL}${API_WEATHER_PATH}/${cityName}`;
 
         try {
@@ -600,8 +603,14 @@
             setTimeout(resolve, 800)
           );
 
-          // 呼叫修正後的 URL
-          const fetchPromise = fetch(requestUrl).then((res) => res.json());
+          // 呼叫正確的 URL
+          const fetchPromise = fetch(requestUrl).then((res) => {
+            if (!res.ok) {
+              // 如果 HTTP 狀態碼不是 200 OK (例如 401, 404, 500)
+              throw new Error(`HTTP Error status: ${res.status}`);
+            }
+            return res.json();
+          });
 
           // 等待兩個 Promise 完成
           const [_, json] = await Promise.all([delayPromise, fetchPromise]);
@@ -611,7 +620,7 @@
             $loading.style.display = "none";
             $mainContent.style.display = "block";
           } else {
-            // 如果後端返回的錯誤訊息是找不到路徑，這裡會被捕捉
+            // 如果後端返回 {success: false}
             throw new Error(json.message || "API 錯誤");
           }
         } catch (e) {
@@ -622,7 +631,9 @@
             `😭 ${cityName.replace(
               "臺",
               "台"
-            )} 的天氣資料讀取失敗，請檢查 API 網址或後端服務是否正常。`
+            )} 的天氣資料讀取失敗，請檢查 API 網址或後端服務是否正常。錯誤: ${
+              e.message
+            }`
           );
         }
       }
