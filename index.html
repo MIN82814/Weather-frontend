@@ -19,7 +19,7 @@
     />
 
     <style>
-      /* === 吉伊卡娃風格變數 === */
+      /* === 吉伊卡娃風格變數 (CSS 保持不變) === */
       :root {
         --ckw-pink: #fee7f2;
         /* 吉伊卡娃的粉色主色 */
@@ -385,8 +385,16 @@
     </div>
 
     <script>
-      // 後端 API 基礎 URL，請根據您實際部署的位址修改
-      const API_BASE_URL = "https://cwa-backend-api.zeabur.app/api/weather";
+      // === 程式碼修改處 START ===
+
+      // ⚠️ 【重要】請將此變數替換為您 Zeabur 後端服務的根網址
+      // 例如: "https://your-service-name.zeabur.app"
+      // 確保結尾沒有斜線 (/)
+      const API_ROOT_URL = "https://cwa-backend-api.zeabur.app";
+      // 後端天氣路由的固定前綴
+      const API_WEATHER_PATH = "/api/weather";
+
+      // === 程式碼修改處 END ===
 
       // 台灣主要城市列表 (名稱須與 CWA API 接受的 locationName 一致)
       const CITIES = [
@@ -415,7 +423,7 @@
       ];
 
       let currentLocationIndex = 0;
-      let isGeolocationSet = false; // 判斷第一個地區是否已設定為定位結果
+      let isGeolocationSet = false;
 
       const $locationPill = document.getElementById("locationPill");
       const $mainContent = document.getElementById("mainContent");
@@ -428,7 +436,6 @@
        * === 工具函式 ===
        */
 
-      // 根據天氣描述回傳吉伊卡娃風格的表情符號
       function getWeatherIcon(weather) {
         if (!weather) return "✨";
         if (weather.includes("晴") || weather.includes("多雲")) return "☀️";
@@ -439,7 +446,6 @@
         return "😊";
       }
 
-      // 根據天氣狀況提供吉伊卡娃風格的建議
       function getAdvice(rainProb, maxTemp) {
         const r = parseInt(rainProb);
         const t = parseInt(maxTemp);
@@ -471,7 +477,6 @@
         return { rainIcon, rainText, clothIcon, clothText };
       }
 
-      // 取得時間段 (早晨/中午/下午/晚上/深夜)
       function getTimePeriod(startTime) {
         const hour = new Date(startTime).getHours();
         if (hour >= 5 && hour < 11) return "早晨";
@@ -481,12 +486,7 @@
         return "深夜";
       }
 
-      // 根據經緯度找到最接近的城市
       function findClosestCity(latitude, longitude) {
-        // 這個函式需要後端或一個包含城市座標的資料集才能精確實現。
-        // 為了簡化，前端這裡僅使用一個硬編碼的簡易判斷作為示範。
-        // 實際專案中，應透過 GeoCoding API 取得縣市名稱。
-
         // 簡易模擬：台灣西部主要城市
         if (latitude > 25) return "臺北市";
         if (latitude > 24) return "臺中市";
@@ -498,52 +498,50 @@
        * === 核心邏輯：資料抓取與渲染 ===
        */
 
-      // 渲染畫面
       function renderWeather(data, cityName) {
         const forecasts = data.forecasts;
         const current = forecasts[0];
         const others = forecasts.slice(1);
 
         // 1. 更新地區標籤
-        $locationPill.textContent = cityName.replace("臺", "台"); // 統一轉換為「台」顯示
+        $locationPill.textContent = cityName.replace("臺", "台");
 
         // 2. 渲染 Hero Card (主畫面)
         const advice = getAdvice(current.rain, current.maxTemp);
         const period = getTimePeriod(current.startTime);
-        // 由於 CWA API 溫度是區間，我們取平均值呈現主畫面溫度
         const avgTemp = Math.round(
           (parseInt(current.maxTemp) + parseInt(current.minTemp)) / 2
         );
 
         document.getElementById("heroCard").innerHTML = `
-                <div class="hero-card">
-                    <div class="hero-period">${period}的吉伊卡娃</div>
-                    <div class="hero-temp-container">
-                        <div class="hero-icon">${getWeatherIcon(
-                          current.weather
-                        )}</div>
-                        <div class="hero-temp">${avgTemp}°</div>
-                    </div>
-                    <div class="hero-desc">${current.weather}</div>
+                <div class="hero-card">
+                    <div class="hero-period">${period}的吉伊卡娃</div>
+                    <div class="hero-temp-container">
+                        <div class="hero-icon">${getWeatherIcon(
+          current.weather
+        )}</div>
+                        <div class="hero-temp">${avgTemp}°</div>
+                    </div>
+                    <div class="hero-desc">${current.weather}</div>
 
-                    <div class="advice-grid">
-                        <div class="advice-item">
-                            <div class="advice-icon">${advice.rainIcon}</div>
-                            <div class="advice-text">${advice.rainText}</div>
-                            <div style="font-size:0.8rem; color:#999; font-weight:normal;">💧 ${
-                              current.rain
-                            }</div>
-                        </div>
-                        <div class="advice-item">
-                            <div class="advice-icon">${advice.clothIcon}</div>
-                            <div class="advice-text">${advice.clothText}</div>
-                            <div style="font-size:0.8rem; color:#999; font-weight:normal;">高溫 ${
-                              current.maxTemp
-                            }</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+                    <div class="advice-grid">
+                        <div class="advice-item">
+                            <div class="advice-icon">${advice.rainIcon}</div>
+                            <div class="advice-text">${advice.rainText}</div>
+                            <div style="font-size:0.8rem; color:#999; font-weight:normal;">💧 ${
+          current.rain
+        }</div>
+                        </div>
+                        <div class="advice-item">
+                            <div class="advice-icon">${advice.clothIcon}</div>
+                            <div class="advice-text">${advice.clothText}</div>
+                            <div style="font-size:0.8rem; color:#999; font-weight:normal;">高溫 ${
+          current.maxTemp
+        }</div>
+                        </div>
+                    </div>
+                </div>
+            `;
 
         // 3. 渲染稍後預報
         const scrollContainer = document.getElementById("futureForecasts");
@@ -555,26 +553,25 @@
           let p = getTimePeriod(f.startTime);
           const fDate = new Date(f.startTime);
 
-          // 判斷是否為明天，並在標籤上顯示
           if (fDate.getDate() !== todayDate) {
             p = "明天" + p;
           }
 
           scrollContainer.innerHTML += `
-                    <div class="mini-card">
-                        <div class="mini-time">${p}</div>
-                        <div class="mini-icon">${getWeatherIcon(
-                          f.weather
-                        )}</div>
-                        <div class="mini-temp">${f.minTemp.replace(
-                          "°C",
-                          ""
-                        )}° - ${f.maxTemp.replace("°C", "")}°</div>
-                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${
-                          f.rain
-                        }</div>
-                    </div>
-                `;
+                    <div class="mini-card">
+                        <div class="mini-time">${p}</div>
+                        <div class="mini-icon">${getWeatherIcon(
+            f.weather
+          )}</div>
+                        <div class="mini-temp">${f.minTemp.replace(
+            "°C",
+            ""
+          )}° - ${f.maxTemp.replace("°C", "")}°</div>
+                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${
+            f.rain
+          }</div>
+                    </div>
+                `;
         });
 
         // 4. 右上角顯示今日日期
@@ -594,14 +591,17 @@
         $loading.style.display = "flex";
         $mainContent.style.display = "none";
 
+        // ⚠️ 修正 URL 拼接：確保只有一個斜線在 API_ROOT_URL 和 API_WEATHER_PATH 之間
+        const requestUrl = `${API_ROOT_URL}${API_WEATHER_PATH}/${cityName}`;
+
         try {
           // 定義「最低等待時間」：確保 Loading 畫面有顯示
           const delayPromise = new Promise((resolve) =>
             setTimeout(resolve, 800)
           );
-          const fetchPromise = fetch(`${API_BASE_URL}/${cityName}`).then(
-            (res) => res.json()
-          );
+
+          // 呼叫修正後的 URL
+          const fetchPromise = fetch(requestUrl).then((res) => res.json());
 
           // 等待兩個 Promise 完成
           const [_, json] = await Promise.all([delayPromise, fetchPromise]);
@@ -611,6 +611,7 @@
             $loading.style.display = "none";
             $mainContent.style.display = "block";
           } else {
+            // 如果後端返回的錯誤訊息是找不到路徑，這裡會被捕捉
             throw new Error(json.message || "API 錯誤");
           }
         } catch (e) {
@@ -621,12 +622,11 @@
             `😭 ${cityName.replace(
               "臺",
               "台"
-            )} 的天氣資料讀取失敗，請稍後再試。`
+            )} 的天氣資料讀取失敗，請檢查 API 網址或後端服務是否正常。`
           );
         }
       }
 
-      // 處理地區切換 (左/右鍵)
       function handleLocationChange(direction) {
         currentLocationIndex =
           (currentLocationIndex + direction + CITIES.length) % CITIES.length;
@@ -634,7 +634,6 @@
         fetchWeatherByCity(newCity);
       }
 
-      // 處理使用者定位
       function handleGeolocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -642,28 +641,23 @@
               const { latitude, longitude } = position.coords;
               $geoError.style.display = "none";
 
-              // 根據定位座標，決定最接近的城市
               const locatedCity = findClosestCity(latitude, longitude);
               const cityIndex = CITIES.indexOf(locatedCity);
 
-              // 3. 設定預設地區為定位到的地區
               if (cityIndex !== -1) {
                 currentLocationIndex = cityIndex;
               }
 
-              // 4. 首次載入：根據定位到的城市抓取資料
               fetchWeatherByCity(CITIES[currentLocationIndex]);
               isGeolocationSet = true;
             },
             (error) => {
               console.error("Geolocation Error:", error.message);
               $geoError.style.display = "block";
-              // 1. 定位失敗：預設載入 CITIES[0] (臺北市)
               fetchWeatherByCity(CITIES[currentLocationIndex]);
             }
           );
         } else {
-          // 瀏覽器不支援定位
           $geoError.style.display = "block";
           fetchWeatherByCity(CITIES[currentLocationIndex]);
         }
@@ -674,10 +668,7 @@
        */
 
       document.addEventListener("DOMContentLoaded", () => {
-        // 1. 預設第一個地區是使用者定位到的地區
         handleGeolocation();
-
-        // 2. 介面上需增加左右建，讓使用者自由切換地區
         $prevBtn.addEventListener("click", () => handleLocationChange(-1));
         $nextBtn.addEventListener("click", () => handleLocationChange(1));
       });
