@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>吉伊卡娃氣象台</title>
+    <title>ちいかわ氣象台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,10 +19,10 @@
     />
 
     <style>
-      /* === 吉伊卡娃風格變數 === */
+      /* === ちいかわ風格變數 === */
       :root {
         --ckw-pink: #fee7f2;
-        /* 吉伊卡娃的粉色主色 */
+        /* ちいかわ的粉色主色 */
         --ckw-yellow: #fff9c4;
         /* 奶油黃 */
         --ckw-blue: #e1f5fe;
@@ -159,7 +159,7 @@
         margin: 15px 0;
       }
 
-      /* 吉伊卡娃風格的 Icon 大又圓潤 */
+      /* ちいかわ風格的 Icon 大又圓潤 */
       .hero-icon {
         font-size: 7rem;
         /* 更大 */
@@ -326,7 +326,7 @@
         border: 2px dashed var(--ckw-dark);
       }
 
-      /* 讓吉伊卡娃在讀取時晃動 */
+      /* 讀取時晃動 */
       .chii-wave {
         font-size: 5rem;
         animation: wave 1.5s infinite;
@@ -396,7 +396,7 @@
           style="height: 100px; width: auto"
         />
       </div>
-      <p class="loading-text">吉伊卡娃正在觀測雲的流動...</p>
+      <p class="loading-text">ちいかわ正在觀測雲的流動...</p>
     </div>
 
     <div class="status-bar">
@@ -554,7 +554,7 @@
 
         document.getElementById("heroCard").innerHTML = `
           <div class="hero-card">
-              <div class="hero-period">${period}的吉伊卡娃</div>
+              <div class="hero-period">${period}的ちいかわ</div>
               <div class="hero-temp-container">
                   <div class="hero-icon">${getWeatherIcon(
                     current.weather
