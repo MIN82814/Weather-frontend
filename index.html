@@ -19,7 +19,7 @@
     />
 
     <style>
-      /* === 吉伊卡娃風格變數 (CSS 保持不變) === */
+      /* === 吉伊卡娃風格變數 === */
       :root {
         --ckw-pink: #fee7f2;
         /* 吉伊卡娃的粉色主色 */
@@ -139,10 +139,11 @@
         position: absolute;
         top: -25px;
         left: 50%;
-        transform: translateX(-50%); /* 修正旋轉效果，只保留置中 */
+        transform: translateX(-50%);
         background: #ffbf00;
         color: var(--ckw-dark);
         padding: 8px 25px;
+        min-width: 200px;
         border-radius: 25px;
         font-weight: 900;
         border: 3px solid white;
@@ -213,7 +214,7 @@
         border: 2px dashed rgb(56, 132, 35);
       }
 
-      /* 修正：為圖片設定寬高 */
+      /* 設定圖片的寬高 */
       .advice-icon {
         width: auto;
         height: 100px;
@@ -352,12 +353,49 @@
           transform: rotate(0deg);
         }
       }
+
+      /* === 手機版響應式設計 (Media Query) === */
+      @media (max-width: 600px) {
+        /* 讓狀態列從左右排列變成上下堆疊 */
+        .status-bar {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        /* 讓地區區塊橫向佔滿，並置中 */
+        .location-area {
+          width: 100%;
+          justify-content: space-around;
+        }
+
+        /* 讓更新時間區塊置中 */
+        .update-pill {
+          margin: 0 auto;
+        }
+
+        /* 讓建議區塊上下排列 */
+        .advice-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        /* 讓主要溫度稍微小一點 */
+        .hero-temp {
+          font-size: 4.5rem;
+        }
+      }
     </style>
   </head>
 
   <body>
     <div id="loading" class="loading-screen">
-      <div class="chii-wave"><img src="cloth-normal.png" alt="" /></div>
+      <div class="chii-wave">
+        <img
+          src="cloth-normal.png"
+          alt="Loading"
+          style="height: 100px; width: auto"
+        />
+      </div>
       <p class="loading-text">吉伊卡娃正在觀測雲的流動...</p>
     </div>
 
@@ -385,7 +423,7 @@
     </div>
 
     <script>
-      // === 程式碼修改處 START ===
+      // === JavaScript 區塊 ===
 
       const API_ROOT_URL = "https://min-weather.zeabur.app";
       const API_WEATHER_PATH = "/api/weather";
